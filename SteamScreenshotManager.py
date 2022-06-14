@@ -39,11 +39,28 @@ def run():
                     return
 
             # 如果此前创建了官方游戏名称的文件夹，则重命名成我们自定义的名称
-            official_path = os.path.join(pic_dir, app_info[str(appid_dict['appid'])])
+            app_name = app_info[str(appid_dict['appid'])]
+            app_name = re.sub(r'[\\\*\?\|/:"<>\.]', '', app_name)
+            official_path = os.path.join(pic_dir, app_name)
             rename_path = os.path.join(pic_dir, appid_dict['name'])
+
             if os.path.exists(official_path):
-                os.rename(official_path, rename_path)
-                print('重命名文件夹：%s -> %s' % (official_path, rename_path))
+                if not os.path.exists(rename_path):
+                    os.rename(official_path, rename_path)
+                    print('重命名文件夹：%s -> %s' % (official_path, rename_path))
+                else:
+                    pic_files = os.listdir(official_path)         
+                    for file in pic_files:
+                        file_path = os.path.join(official_path, file)   
+                        if os.path.isfile(file_path):
+                            if os.path.exists(os.path.join(rename_path, file)):
+                                print("%s中已存在%s，跳过，不移动" % (rename_path, file))
+                                continue
+                            else:
+                                shutil.move(file_path, rename_path)
+                                print('移动文件[%s] %s' % (appid_dict['name'], file))
+                    os.removedirs(official_path)
+                    print('删除文件夹%s' % official_path)
 
             # 其他的单个图片此后也用我们自定义的名称
             app_info[str(appid_dict['appid'])] = appid_dict['name']
