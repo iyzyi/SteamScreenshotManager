@@ -74,6 +74,9 @@ def run():
             continue
         appid, time = res.group(1), res.group(2)
         
+        if len(appid) == 20:        # 本地导入的游戏，appid长度为20，可能是sha160摘要。
+            continue
+        
         if appid in app_info.keys():
             app_name = app_info[appid]
             app_name = re.sub(r'[\\\*\?\|/:"<>\.]', '', app_name)
